@@ -12,6 +12,9 @@ ofApp::~ofApp() {
 void ofApp::setup()
 {
     ofSetFrameRate(60);
+    ofSetWindowTitle("Drawing Scanner");
+    ofSetWindowPosition(1300,20);
+    ofSetEscapeQuitsApp(false);
 
     scanner.setup();
     ofAddListener(scanner.lineEvent, this, &ofApp::lineEvent);
@@ -24,6 +27,8 @@ void ofApp::setup()
     sender2.setup(HOST2,PORT);
     sender3.setup(HOST3,PORT);
     sender4.setup(HOST4,PORT);
+
+    bIsBlack = false;
 }
 
 //--------------------------------------------------------------------
@@ -39,6 +44,7 @@ void ofApp::update()
 //--------------------------------------------------------------------
 void ofApp::draw()
 {
+
     if(ofGetFrameNum() % 60 == 0 && ofGetFrameRate() < 59)
         cout << "slow: " << ofGetFrameRate() << "fps" << endl;
 }
@@ -52,8 +58,19 @@ void ofApp::scanImage()
 
 //--------------------------------------------------------------------
 void ofApp::keyPressed(int key) {
-    if(key == ' ') {
-        scanner.stop();
+    if(key == '0') {
+        bIsBlack = !bIsBlack;
+        ofxOscMessage m;
+        if(bIsBlack) {
+            m.setAddress("/projection/stop");
+        } else {
+            m.setAddress("/projection/start");
+        }
+        sender1.sendMessage(m);
+        sender2.sendMessage(m);
+        sender3.sendMessage(m);
+        sender4.sendMessage(m);
+
     }
     else if(key == '1'){
         scanImage();
@@ -95,7 +112,7 @@ void ofApp::saveImage(int which)
 
         //bool bLoaded = img[which].load("scan"+ofToString(which)+".png");
         //if(bLoaded)
-        ofSaveImage(img[which].getPixels(),imgAsBuffer,OF_IMAGE_FORMAT_JPEG,OF_IMAGE_QUALITY_HIGH);
+        ofSaveImage(img[which].getPixels(),imgAsBuffer,OF_IMAGE_FORMAT_JPEG,OF_IMAGE_QUALITY_MEDIUM);
         sendImage(which);
     }
 }
@@ -107,7 +124,7 @@ void ofApp::sendImage(int which)
     ofxOscMessage m;
     m.setAddress("/image");
     m.addIntArg(0); // surface id
-    m.addIntArg(which);
+    m.addIntArg(0); // appid
     m.addBlobArg(imgAsBuffer);
     switch(which)
     {

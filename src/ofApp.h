@@ -5,10 +5,10 @@
 #include "ofxOsc.h"
 #include <list>
 
-#define HOST1 "192.168.0.51"
-#define HOST2 "localhost"
-#define HOST3 "192.168.0.61"
-#define HOST4 "192.168.0.71"
+#define HOST1 "localhost"
+#define HOST2 "192.168.1.4"
+#define HOST3 "192.168.1.3"
+#define HOST4 "192.168.1.5"
 #define PORT 12345
 
 class ofApp : public ofBaseApp{
@@ -40,5 +40,6 @@ public:
     ofxOscSender sender3;
     ofxOscSender sender4;
     ofBuffer imgAsBuffer;
-    int imageId;;
+    int imageId;
+    bool bIsBlack;
 };
